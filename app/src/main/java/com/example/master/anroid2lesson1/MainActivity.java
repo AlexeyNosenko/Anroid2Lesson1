@@ -1,16 +1,20 @@
 package com.example.master.anroid2lesson1;
 
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
@@ -27,14 +31,29 @@ public class MainActivity extends AppCompatActivity {
     private final String DL_BTN_POSITIVE = "Ok";
     private final String DL_BTN_NEGATIVE = "Cancel";
 
+    private Cursor cursor;
+
+    private DbTaskList dbTaskList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         lvList = (ListView) findViewById(R.id.lvList);
-
         registerForContextMenu(lvList);
+
+        dbTaskList = new DbTaskList(this);
+
+        cursor = dbTaskList.getAllData();
+        startManagingCursor(cursor);
+
+        String[] column = new String[]{//DbTaskList.TblTasks._ID,
+                                       DbTaskList.TblTasks.CLN_TASK
+                                       //DbTaskList.TblTasks.CLN_COMPLETE,
+                                       //DbTaskList.TblTasks.CLN_REF_MAIN_TASK
+                                      };
+
     }
 
     @Override
@@ -55,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case MENU_LIST_DELETE:
-                // deleteRow(getDataFromRow(getSelectedrowNum))
+                AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                dbTaskList.deleteTask(menuInfo.id);
+
                 break;
         }
         return super.onContextItemSelected(item);
@@ -88,14 +109,14 @@ public class MainActivity extends AppCompatActivity {
         dl.setTitle(DL_TITLE);
         dl.setMessage(DL_MESSAGE);
 
-        EditText newTask = new EditText(this);
+        final EditText newTask = new EditText(this);
 
         dl.setView(newTask);
 
         dl.setPositiveButton(DL_BTN_POSITIVE, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // addRowInDB
+                dbTaskList.addTask(newTask.getText().toString());
             }
         });
 
