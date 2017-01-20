@@ -1,7 +1,9 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.master.anroid2lesson1.MainActivity" >
+    tools:context="com.example.master.anroid2lesson1.MainActivity">
     <item
         android:id="@+id/action_add"
         android:title="@string/menu_add"

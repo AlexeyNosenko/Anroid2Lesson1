@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">Anroid2Lesson1</string>
+    <string name="app_name">Список задач</string>
     <string name="action_settings">Settings</string>
-    <string name="menu_add">Добавить</string>
-    <string name="menu_delete">Удалить</string>
+    <string name="menu_add">Добавить задачу</string>
+    <string name="menu_context_add">Добавить подзадачу</string>
+    <string name="menu_context_delete">Удалить</string>
 </resources>
