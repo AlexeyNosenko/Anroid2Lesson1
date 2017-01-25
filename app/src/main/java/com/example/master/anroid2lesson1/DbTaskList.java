@@ -54,6 +54,10 @@ public class DbTaskList extends DBHelper {
         if (mainTaskId != EMPTY_MAIN_TASK) {
             contentValues.put(TblTasks.CLN_REF_MAIN_TASK, mainTaskId);
         }
+        return addTask(contentValues);
+    }
+
+    public long addTask(ContentValues contentValues){
         return this.getWritableDatabase().insert(TblTasks.TBL_NAME, null, contentValues);
     }
 
@@ -72,6 +76,7 @@ public class DbTaskList extends DBHelper {
     }
 
     public long deleteTask(long id){
+        Log.d("LG", "delete " + id);
         deleteSubTasks(id);
         return this.getWritableDatabase().delete(TblTasks.TBL_NAME, TblTasks._ID + " = " + id, null);
     }

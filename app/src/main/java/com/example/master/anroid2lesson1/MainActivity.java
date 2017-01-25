@@ -1,5 +1,7 @@
 package com.example.master.anroid2lesson1;
 
+import android.content.ContentProvider;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import android.widget.SimpleCursorAdapter;
 
 import java.util.Stack;
 
+import static com.example.master.anroid2lesson1.DbTaskList.EMPTY_MAIN_TASK;
+
 public class MainActivity extends AppCompatActivity {
 
     private ListView lvList = null;
@@ -33,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Cursor cursor;
 
-    private DbTaskList dbTaskList;
+    //private DbTaskList dbTaskList;
 
     private Stack<Long> transitionTask = new Stack<>();
-    private long currentTask = DbTaskList.EMPTY_MAIN_TASK;
+    private long currentTask = EMPTY_MAIN_TASK;
 
     @Override
     public void onBackPressed() {
@@ -68,12 +72,19 @@ public class MainActivity extends AppCompatActivity {
 
         registerForContextMenu(lvList);
 
-        dbTaskList = new DbTaskList(this);
-        getTasks(DbTaskList.EMPTY_MAIN_TASK);
+        //dbTaskList = new DbTaskList(this);
+        getTasks(EMPTY_MAIN_TASK);
     }
 
     private void getTasks(long task_id){
-        cursor = dbTaskList.getTasks(task_id);
+        String selection;
+        if (task_id == EMPTY_MAIN_TASK){
+            selection  = null;
+        }
+        else {
+            selection = DbTaskList.TblTasks.CLN_REF_MAIN_TASK + " = " + task_id;
+        }
+        cursor = getContentResolver().query(MyContentProvider.CONTENT_URI_TASK, null, selection, null, null);//dbTaskList.getTasks(task_id);
         startManagingCursor(cursor);
 //        Log.d(LOG_TAG, "cursor.getCount(): " + cursor.getCount());
         updateList();
@@ -111,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteRowInList(long id) {
-        dbTaskList.deleteTask(id);
+        Log.d(LOG_TAG, "deleteRowInList " + String.valueOf(id));
+        getContentResolver().delete(MyContentProvider.CONTENT_URI_TASK, String.valueOf(id), null);
         updateList();
     }
 
@@ -152,7 +164,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Log.d(LOG_TAG, "onClickPositive: " + newTask.getText().toString());
-                dbTaskList.addTask(newTask.getText().toString(), id);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(DbTaskList.TblTasks.CLN_TASK, newTask.getText().toString());
+                if (id != EMPTY_MAIN_TASK) {
+                    contentValues.put(DbTaskList.TblTasks.CLN_REF_MAIN_TASK, id);
+                }
+                getContentResolver().insert(MyContentProvider.CONTENT_URI_TASK, contentValues);
                 updateList();
             }
         });
@@ -168,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        dbTaskList.close();
+        cursor.close();
         super.onDestroy();
     }
 }
